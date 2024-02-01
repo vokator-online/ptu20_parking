@@ -5,7 +5,7 @@ from typing import Any
 
 def get_tariff_list(
         connection: sqlite3.Connection = connection, 
-        cursor: sqlite3.Cursor = cursor
+        cursor: sqlite3.Cursor = cursor,
     ) -> list[Any]:
     with connection:
         cursor.execute("SELECT * FROM tariff ORDER BY duration_hours")
@@ -15,7 +15,7 @@ def get_tariff_list(
 def db_insert_tariff(
         values: tuple[str, Any], 
         connection: sqlite3.Connection = connection,
-        cursor: sqlite3.Cursor = cursor
+        cursor: sqlite3.Cursor = cursor,
     ) -> bool:
     try:
         duration_hours = int(values["-DURATION-"])
@@ -62,7 +62,7 @@ def db_remove_tariff(
         values: tuple[str, Any], 
         tariff_list: list[Any],
         connection: sqlite3.Connection = connection,
-        cursor: sqlite3.Cursor = cursor
+        cursor: sqlite3.Cursor = cursor,
     ) -> bool:
     tariff_to_remove = tariff_list[values["-TARIFF-LIST-"][0]]
     if sg.PopupYesNo(f"Remove tariff up to {tariff_to_remove[1]} hours at"
@@ -102,7 +102,6 @@ def manage_tariffs(main_window: sg.Window):
     window = sg.Window(
         "Tariffs | Parking PTU20", 
         layout, 
-        font="sans-serif 20", 
         element_padding=10,
         size=(500, 500),
     )
