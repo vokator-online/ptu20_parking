@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 from gui_tariffs import manage_tariffs
 
 sg.theme("dark")
+sg.set_options(font="sans-serif 20")
 
 main_layout = [
     [
@@ -20,7 +21,6 @@ main_layout = [
 main_window = sg.Window(
     "Parking PTU20", 
     main_layout, 
-    font="sans-serif 20", 
     element_justification="center", 
     element_padding=10,
 )
