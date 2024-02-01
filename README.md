@@ -1,5 +1,6 @@
 # Parking DB GUI app
 ## tariff_list (list/create/update/delete)
+in progress
 ## cars_list (list/create/delete)
 ## arrival
 ### choose/create car
