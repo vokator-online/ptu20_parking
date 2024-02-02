@@ -9,6 +9,9 @@ def insert_arrival(
         connection: sqlite3.Connection = connection,
         cursor: sqlite3.Cursor = cursor,
     ) -> bool:
+    if len(values['-PLATE-']) == 0 or values["-PLATE-"].startswith(' '):
+        sg.PopupOK("Plate cannot be empty and must not start with a space", title="Input Error")
+        return False
     try:
         with connection:
             cursor.execute("INSERT INTO car (plate) VALUES (?)", (values["-PLATE-"],))
