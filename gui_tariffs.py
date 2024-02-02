@@ -113,7 +113,9 @@ def manage_tariffs(main_window: sg.Window):
             if add_tariff(window):
                 tariff_list = refresh_tariff_table(window)
         if event == "-REMOVE-":
-            if db_remove_tariff(values, tariff_list):
+            if values["-TARIFF-LIST-"] and \
+                    len(values["-TARIFF-LIST-"]) > 0 and \
+                    db_remove_tariff(values, tariff_list):
                 tariff_list = refresh_tariff_table(window)
 
     window.close()
