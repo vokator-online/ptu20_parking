@@ -4,8 +4,14 @@ from parking_db import connection, cursor
 from typing import Any
 from datetime import datetime, timedelta
 from gui_tariffs import get_tariff_list
+from math import ceil
 
-def find_tariff(duration: timedelta):
+def get_duration_in_hours(duration: timedelta) -> int:
+    duration_hours = duration.days * 24 + duration.seconds / 3600
+    rounded_up_duration = ceil(duration_hours)
+    return rounded_up_duration
+
+def find_tariff(duration: timedelta) -> tuple:
     duration_hours = duration.days * 24 + duration.seconds / 3600
     tariff_list = get_tariff_list()
     selected_tariff = tariff_list[0]
@@ -43,15 +49,19 @@ def process_departure(
     departure_time = datetime.now()
     parking_duration = departure_time - datetime.fromisoformat(parking_entry[1])
     tariff = find_tariff(parking_duration)
-    
-    # try:
-    #     with connection:
-    #         cursor.execute("UPDATE parking SET departure=?, tariff_id=?, total_price=? WHERE id=?",
-    #                        ())
-    # except Exception as error:
-    #     sg.PopupOK(f"DB error {error.__class__.__name__}: {error}", title="DB Error")
-    #     return False
-        
+    duration = get_duration_in_hours(parking_duration)
+    total_price = tariff[2] * duration
+    # print(tariff, duration, total_price)
+    try:
+        with connection:
+            cursor.execute("UPDATE parking SET departure=?, tariff_id=?, total_price=? "
+                           "WHERE id=?", (departure_time, tariff[0], total_price, parking_entry[0]))
+    except Exception as error:
+        sg.PopupOK(f"DB error {error.__class__.__name__}: {error}", title="DB Error")
+        return False
+    else:
+        sg.PopupOK(f"{values['-PLATE-']} total duration: {duration} h, price: {total_price}", title="Success")
+        return True
 
 def register_departure(main_window: sg.Window):
     main_window.hide()
