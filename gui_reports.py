@@ -14,8 +14,12 @@ def get_parkings(departure_from: str, departure_to: str,
     JOIN tariff ON tariff_id = tariff.id
     WHERE departure >= DATE(?) AND departure <= DATE(?);'''
     with connection:
-        cursor.execute(query, (departure_from, departure_to))
-        parkings = cursor.fetchall()
+        try:
+            cursor.execute(query, (departure_from, departure_to))
+            parkings = cursor.fetchall()
+        except Exception as error:
+            sg.PopupOK(f"DB Error {error.__class__.__name__}: {error}", title="DB Error")
+            return []
     clean_parkings = []
     for parking in parkings:
         clean_parkings.append((
@@ -34,9 +38,15 @@ def get_total_revenue(departure_from: str, departure_to: str,
     query = '''SELECT SUM(total_price) FROM parking 
     WHERE departure >= DATE(?) AND departure <= DATE(?);'''
     with connection:
-        cursor.execute(query, (departure_from, departure_to))
-        total = f"{cursor.fetchone()[0]:.2f} €"
-    return total
+        try:
+            cursor.execute(query, (departure_from, departure_to))
+            result = cursor.fetchone()
+        except Exception as error:
+            sg.PopupOK(f"DB Error {error.__class__.__name__}: {error}", title="DB Error")
+            total = 0
+        else:
+            total = result[0] or 0
+    return f"{total:.2f} €"
 
 def reports(main_window: sg.Window):
     main_window.hide()
@@ -62,6 +72,7 @@ def reports(main_window: sg.Window):
         if event in [sg.WINDOW_CLOSED, "-RETURN-"]:
             break
         if event == "-FILTER-":
-            pass
+            window["-TABLE-"].update(values=get_parkings(values["-FROM-"], values["-TO-"]))
+            window["-TOTAL-"].update(get_total_revenue(values["-FROM-"], values["-TO-"]))
     window.close()
     main_window.un_hide()
