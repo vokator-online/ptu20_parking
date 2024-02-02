@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 from gui_tariffs import manage_tariffs
 from gui_arrival import register_arrival
 from gui_departure import register_departure
+from gui_reports import reports
 
 sg.theme("dark")
 sg.set_options(font="sans-serif 20")
@@ -39,3 +40,5 @@ while True:
         register_arrival(main_window)
     if event == "-DEPARTURE-":
         register_departure(main_window)
+    if event == "-REPORTS-":
+        reports(main_window)
