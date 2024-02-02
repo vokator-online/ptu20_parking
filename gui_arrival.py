@@ -3,6 +3,7 @@ import PySimpleGUI as sg
 from parking_db import connection, cursor
 from typing import Any
 from datetime import datetime
+from gui_departure import get_parked_car
 
 def insert_arrival(
         values: list[Any],
@@ -11,6 +12,10 @@ def insert_arrival(
     ) -> bool:
     if len(values['-PLATE-']) == 0 or values["-PLATE-"].startswith(' '):
         sg.PopupOK("Plate cannot be empty and must not start with a space", title="Input Error")
+        return False
+    parked_car = get_parked_car(values)
+    if parked_car:
+        sg.PopupOK(f"This car is already parked from {parked_car[1][:19]}")
         return False
     try:
         with connection:
@@ -29,7 +34,7 @@ def insert_arrival(
         arrival_time = datetime.now()
         with connection:
             cursor.execute(
-                "INSERT INTO parking (arrival, car_id) VALUES (?, ?)",
+                "INSERT INTO parking (arrival, car_id) VALUES (DATETIME(?), ?)",
                 (arrival_time, car[0])
             )
     except Exception as error:
